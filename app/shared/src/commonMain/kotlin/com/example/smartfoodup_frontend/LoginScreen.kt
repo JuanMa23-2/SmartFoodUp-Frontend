@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -22,15 +21,25 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
+
+
+import smartfoodup_frontend.app.shared.generated.resources.Res
+import smartfoodup_frontend.app.shared.generated.resources.logo_smartfoodup
 
 @Composable
-fun LoginScreen(onNavigateToRegister: () -> Unit) {
+fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var mensajeError by remember { mutableStateOf("") }
+    var cargando by remember { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
+
+    val scope = rememberCoroutineScope()
+    val apiService = remember { SmartFoodApiService() }
 
     Column(
         modifier = Modifier
@@ -42,9 +51,9 @@ fun LoginScreen(onNavigateToRegister: () -> Unit) {
     ) {
         Spacer(modifier = Modifier.height(40.dp))
 
-        // 🍎 LOGO OFICIAL
+        // 🖼️ Logo multiplataforma
         Image(
-            painter = painterResource(id = R.drawable.logo_smartfoodup),
+            painter = painterResource(Res.drawable.logo_smartfoodup),
             contentDescription = "Logo SmartFoodUp",
             modifier = Modifier
                 .size(160.dp)
@@ -80,6 +89,7 @@ fun LoginScreen(onNavigateToRegister: () -> Unit) {
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            enabled = !cargando,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
@@ -100,6 +110,7 @@ fun LoginScreen(onNavigateToRegister: () -> Unit) {
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            enabled = !cargando,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
@@ -111,33 +122,56 @@ fun LoginScreen(onNavigateToRegister: () -> Unit) {
 
         if (mensajeError.isNotEmpty()) {
             Spacer(modifier = Modifier.height(12.dp))
-            Text(text = mensajeError, color = MaterialTheme.colorScheme.error, fontSize = 14.sp)
+            Text(
+                text = mensajeError,
+                color = if (mensajeError.contains("exitoso")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center
+            )
         }
 
         Spacer(modifier = Modifier.height(36.dp))
 
-        // Botón de Login
+        // Botón de Login Conectado a Railway
         Button(
             onClick = {
                 if (email.isBlank() || password.isBlank()) {
                     mensajeError = "Por favor, ingresa tu correo y contraseña."
                 } else {
                     mensajeError = ""
-                    println("Simulando login para: $email")
+                    cargando = true
+
+                    scope.launch {
+                        // Reutilizamos RegistroRequest (con nombre vacío) para comunicarnos con el Endpoint
+                        val requestData = RegistroRequest(nombre = "", email = email, contrasena = password)
+                        val resultado = apiService.iniciarSesion(requestData)
+
+                        cargando = false
+                        mensajeError = resultado.mensaje
+
+                        if (resultado.exitoso) {
+                            onLoginSuccess() // Manda al usuario al panel principal
+                        }
+                    }
                 }
             },
+            enabled = !cargando,
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp)
         ) {
-            Text("Iniciar Sesión", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            if (cargando) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
+            } else {
+                Text("Iniciar Sesión", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Enlace para ir a Registro
-        TextButton(onClick = onNavigateToRegister) {
+        TextButton(onClick = onNavigateToRegister, enabled = !cargando) {
             Text(
                 text = "¿No tienes una cuenta? Regístrate aquí",
                 fontWeight = FontWeight.SemiBold,

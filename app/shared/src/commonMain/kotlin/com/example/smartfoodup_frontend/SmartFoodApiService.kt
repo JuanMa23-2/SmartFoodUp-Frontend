@@ -9,20 +9,14 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.Serializable
 
-//Modelos de datos para el flujo de autenticación
-@Serializable
-data class RegistroRequest(val nombre: String, val email: String, val contrasena: String)
-
-@Serializable
-data class AuthResponse(val exitoso: Boolean, val mensaje: String)
-
-//Cliente HTTP global configurado para Ktor 3.5.0
+// Cliente HTTP global configurado para Ktor
 val client = HttpClient {
     install(ContentNegotiation) {
         json(Json {
-            ignoreUnknownKeys = true
+            ignoreUnknownKeys = true // Ignora campos nuevos que mande el backend y no use el front
+            prettyPrint = true
+            isLenient = true
         })
     }
 }

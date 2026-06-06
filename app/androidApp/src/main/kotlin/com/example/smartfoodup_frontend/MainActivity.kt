@@ -12,7 +12,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MaterialTheme {
-                // Estado simple para controlar qué pantalla ver ("login" o "register")
+                // Estado simple para controlar qué pantalla ver ("login", "register" o "home")
                 var pantallaActual by remember { mutableStateOf("register") }
 
                 when (pantallaActual) {
@@ -20,8 +20,10 @@ class MainActivity : ComponentActivity() {
                         onNavigateToLogin = { pantallaActual = "login" }
                     )
                     "login" -> LoginScreen(
-                        onNavigateToRegister = { pantallaActual = "register" }
+                        onNavigateToRegister = { pantallaActual = "register" },
+                        onLoginSuccess = { pantallaActual = "home" }
                     )
+                    "home" -> App()
                 }
             }
         }
