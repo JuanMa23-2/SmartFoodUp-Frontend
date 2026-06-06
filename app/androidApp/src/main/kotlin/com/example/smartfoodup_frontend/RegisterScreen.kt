@@ -43,7 +43,7 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
     ) {
         Spacer(modifier = Modifier.height(40.dp))
 
-        // 🍎 INTEGRACIÓN DEL LOGO OFICIAL
+        // LOGO PROYECTO
         Image(
             painter = painterResource(id = R.drawable.logo_smartfoodup),
             contentDescription = "Logo SmartFoodUp",
