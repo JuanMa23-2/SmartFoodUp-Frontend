@@ -1,4 +1,7 @@
 package com.example.smartfoodup_frontend
 
-fun sayHello(to: String): String =
-    "Hello, $to!"
+class GreetingUtil {
+    fun greet(): String {
+        return "Hola desde Core"
+    }
+}

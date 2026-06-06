@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.painterResource
 
-import smartfoodupfrontend.app.shared.generated.resources.Res
-import smartfoodupfrontend.app.shared.generated.resources.compose_multiplatform
+import smartfoodup_frontend.app.shared.generated.resources.Res
+import smartfoodup_frontend.app.shared.generated.resources.compose_multiplatform
 
 @Composable
 @Preview
