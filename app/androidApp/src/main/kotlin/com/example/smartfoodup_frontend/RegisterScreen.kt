@@ -1,26 +1,22 @@
 package com.example.smartfoodup_frontend
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -34,67 +30,120 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
     var password by remember { mutableStateOf("") }
     var mensajeError by remember { mutableStateOf("") }
 
+    val focusManager = LocalFocusManager.current
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(horizontal = 28.dp)
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(40.dp))
+
+        // 🍎 INTEGRACIÓN DEL LOGO OFICIAL
+        Image(
+            painter = painterResource(id = R.drawable.logo_smartfoodup),
+            contentDescription = "Logo SmartFoodUp",
+            modifier = Modifier
+                .size(160.dp)
+                .clip(RoundedCornerShape(16.dp))
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Título Principal
         Text(
             text = "Crear Cuenta",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 26.sp,
+            fontWeight = FontWeight.ExtraBold,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 8.dp)
+            letterSpacing = 0.5.sp
         )
+
+        Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "Monitorea la frescura de tus alimentos con SmartFoodUp",
+            text = "Monitorea la frescura de tus alimentos de forma inteligente.",
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 32.dp),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 12.dp)
         )
 
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Campo: Nombre Completo
         OutlinedTextField(
             value = nombre,
             onValueChange = { nombre = it },
             label = { Text("Nombre Completo") },
+            shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Campo: Correo Electrónico
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
             label = { Text("Correo Electrónico") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Campo: Contraseña
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Contraseña") },
+            shape = RoundedCornerShape(12.dp),
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { focusManager.clearFocus() }
+            )
         )
 
         if (mensajeError.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = mensajeError, color = MaterialTheme.colorScheme.error, fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = mensajeError,
+                color = MaterialTheme.colorScheme.error,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium
+            )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(36.dp))
 
+        // Botón de Registro Estilizado
         Button(
             onClick = {
                 if (nombre.isBlank() || email.isBlank() || password.isBlank()) {
@@ -104,17 +153,25 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
                     println("Simulando registro para: $nombre, $email")
                 }
             },
+            shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(52.dp)
         ) {
-            Text("Registrarse", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            Text("Registrarse", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
+        // Enlace para volver al Login
         TextButton(onClick = onNavigateToLogin) {
-            Text("¿Ya tienes una cuenta? Inicia Sesión")
+            Text(
+                text = "¿Ya tienes una cuenta? Inicia Sesión",
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
