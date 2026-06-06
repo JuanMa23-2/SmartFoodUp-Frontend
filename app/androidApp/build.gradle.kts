@@ -12,10 +12,19 @@ kotlin {
     }
 }
 dependencies {
+    // Conexión con la lógica compartida
     implementation(projects.app.shared)
 
+    // Integración de Compose con la Actividad nativa de Android
     implementation(libs.androidx.activity.compose)
 
+    // DEPENDENCIAS DE JETPACK COMPOSE
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.material3)
+
+    // Herramientas de diseño y Preview en el IDE
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)
 }

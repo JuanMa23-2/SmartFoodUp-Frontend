@@ -1,20 +1,34 @@
 package com.example.smartfoodup_frontend
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun RegisterScreen(onNavigateToLogin: () -> Unit) {
-    // Estados locales para capturar lo que escribe el usuario
     var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -27,7 +41,6 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Título Principal
         Text(
             text = "Crear Cuenta",
             fontSize = 28.sp,
@@ -41,10 +54,9 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 32.dp),
-            alignment = Alignment.CenterHorizontally
+            textAlign = TextAlign.Center
         )
 
-        // Campo: Nombre
         OutlinedTextField(
             value = nombre,
             onValueChange = { nombre = it },
@@ -55,7 +67,6 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo: Email
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -67,7 +78,6 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo: Contraseña
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -78,7 +88,6 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
             singleLine = true
         )
 
-        // Mostrar alerta si faltan campos
         if (mensajeError.isNotEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = mensajeError, color = MaterialTheme.colorScheme.error, fontSize = 14.sp)
@@ -86,14 +95,12 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Botón de Registro
         Button(
             onClick = {
                 if (nombre.isBlank() || email.isBlank() || password.isBlank()) {
                     mensajeError = "Por favor, llena todos los campos."
                 } else {
                     mensajeError = ""
-                    // TODO: Aquí llamaremos a la función del shared module en la siguiente rama
                     println("Simulando registro para: $nombre, $email")
                 }
             },
@@ -106,7 +113,6 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Enlace para volver al Login
         TextButton(onClick = onNavigateToLogin) {
             Text("¿Ya tienes una cuenta? Inicia Sesión")
         }
