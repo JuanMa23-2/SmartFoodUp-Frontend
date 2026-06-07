@@ -24,12 +24,11 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
-
 import smartfoodup_frontend.app.shared.generated.resources.Res
 import smartfoodup_frontend.app.shared.generated.resources.logo_smartfoodup
 
 @Composable
-fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit) {
+fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: (String) -> Unit) { // 👈 Firma ajustada
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var mensajeError by remember { mutableStateOf("") }
@@ -51,7 +50,6 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit) {
     ) {
         Spacer(modifier = Modifier.height(40.dp))
 
-        // 🖼️ Logo multiplataforma
         Image(
             painter = painterResource(Res.drawable.logo_smartfoodup),
             contentDescription = "Logo SmartFoodUp",
@@ -81,7 +79,6 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Campo: Correo Electrónico
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -101,7 +98,6 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo: Contraseña
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -124,7 +120,10 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit) {
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = mensajeError,
-                color = if (mensajeError.contains("exitoso")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                color = if (mensajeError.contains("exitoso") || mensajeError.contains("¡"))
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.error,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center
@@ -133,7 +132,6 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit) {
 
         Spacer(modifier = Modifier.height(36.dp))
 
-        // Botón de Login Conectado a Railway
         Button(
             onClick = {
                 if (email.isBlank() || password.isBlank()) {
@@ -143,15 +141,20 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit) {
                     cargando = true
 
                     scope.launch {
-                        // Reutilizamos RegistroRequest (con nombre vacío) para comunicarnos con el Endpoint
-                        val requestData = RegistroRequest(nombre = "", email = email, contrasena = password)
-                        val resultado = apiService.iniciarSesion(requestData)
+                        try {
+                            val requestData = RegistroRequest(nombre = "", email = email, contrasena = password)
+                            val resultado = apiService.iniciarSesion(requestData)
 
-                        cargando = false
-                        mensajeError = resultado.mensaje
+                            cargando = false
+                            mensajeError = resultado.mensaje
 
-                        if (resultado.exitoso) {
-                            onLoginSuccess() // Manda al usuario al panel principal
+                            if (resultado.exitoso) {
+                                // 🚀 Le pasa el nombre devuelto al enrutador o un fallback si es nulo
+                                onLoginSuccess(resultado.nombre ?: "Usuario")
+                            }
+                        } catch (e: Exception) {
+                            cargando = false
+                            mensajeError = "Fallo de conexión local: ${e.message}"
                         }
                     }
                 }

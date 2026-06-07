@@ -28,7 +28,7 @@ import smartfoodup_frontend.app.shared.generated.resources.Res
 import smartfoodup_frontend.app.shared.generated.resources.logo_smartfoodup
 
 @Composable
-fun RegisterScreen(onNavigateToLogin: () -> Unit) {
+fun RegisterScreen(onNavigateToLogin: () -> Unit, onRegisterSuccess: (String) -> Unit) { // 👈 Firma ajustada
     var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -81,7 +81,6 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Campo: Nombre Completo
         OutlinedTextField(
             value = nombre,
             onValueChange = { nombre = it },
@@ -101,7 +100,6 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo: Correo Electrónico
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -121,7 +119,6 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo: Contraseña
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -169,9 +166,11 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
                         mensajeError = resultado.mensaje
 
                         if (resultado.exitoso) {
+                            val nombreRegistrado = resultado.nombre ?: nombre
                             nombre = ""
                             email = ""
                             password = ""
+                            onRegisterSuccess(nombreRegistrado) // 🚀 Manda al dashboard
                         }
                     }
                 }

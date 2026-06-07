@@ -1,17 +1,17 @@
 package com.example.smartfoodup_frontend
 
-import kotlinx.serialization.Serializable // 👈 1. IMPORTANTE: Agrega esta importación
+import kotlinx.serialization.Serializable
 
-@Serializable // 👈 2. IMPORTANTE: Agrega esta anotación aquí arriba
+@Serializable
 data class RegistroRequest(
     val nombre: String,
     val email: String,
     val contrasena: String
 )
 
-@Serializable // 👈 3. También agrégala aquí para cuando manejes la respuesta del servidor
+@Serializable
 data class AuthResponse(
     val exitoso: Boolean,
     val mensaje: String,
-    val token: String? = null
+    val nombre: String? = null // Mapeado perfectamente con el backend
 )

@@ -1,49 +1,39 @@
 package com.example.smartfoodup_frontend
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.resources.painterResource
-
-import smartfoodup_frontend.app.shared.generated.resources.Res
-import smartfoodup_frontend.app.shared.generated.resources.compose_multiplatform
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
+        var pantallaActual by remember { mutableStateOf("login") }
+        //  Variable reactiva para almacenar el nombre del usuario activo
+        var usuarioLogueado by remember { mutableStateOf("") }
+
+        when (pantallaActual) {
+            "login" -> LoginScreen(
+                onNavigateToRegister = { pantallaActual = "register" },
+                onLoginSuccess = { nombreRecibido ->
+                    usuarioLogueado = nombreRecibido // Guarda el nombre
+                    pantallaActual = "dashboard"
                 }
-            }
+            )
+            "register" -> RegisterScreen(
+                onNavigateToLogin = { pantallaActual = "login" },
+                onRegisterSuccess = { nombreRecibido ->
+                    usuarioLogueado = nombreRecibido // Va directo al dashboard con su nombre
+                    pantallaActual = "dashboard"
+                }
+            )
+            "dashboard" -> DashboardScreen(
+                nombreUsuario = usuarioLogueado, // Pasa el nombre real de la base de datos
+                onCerrarSesion = {
+                    usuarioLogueado = ""
+                    pantallaActual = "login"
+                }
+            )
         }
     }
 }
