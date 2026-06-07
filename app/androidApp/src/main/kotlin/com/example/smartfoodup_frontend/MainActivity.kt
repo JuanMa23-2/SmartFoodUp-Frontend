@@ -17,7 +17,8 @@ class MainActivity : ComponentActivity() {
 
                 when (pantallaActual) {
                     "register" -> RegisterScreen(
-                        onNavigateToLogin = { pantallaActual = "login" }
+                        onNavigateToLogin = { pantallaActual = "login" },
+                        onRegisterSuccess = { pantallaActual = "login" }
                     )
                     "login" -> LoginScreen(
                         onNavigateToRegister = { pantallaActual = "register" },
