@@ -19,7 +19,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(nombreUsuario: String, onCerrarSesion: () -> Unit) { // 👈 Recibe el nombre dinámico
+fun DashboardScreen(nombreUsuario: String, onCerrarSesion: () -> Unit) { // Recibe el nombre dinámico
     val colorPrimario = MaterialTheme.colorScheme.primary
     val colorFondo = MaterialTheme.colorScheme.surfaceVariant
 
@@ -66,7 +66,7 @@ fun DashboardScreen(nombreUsuario: String, onCerrarSesion: () -> Unit) { // 👈
         ) {
             // Bienvenida Dinámica
             Text(
-                text = "¡Hola de nuevo, $nombreUsuario!", // 👈 Nombre inyectado directamente aquí
+                text = "¡Hola de nuevo, $nombreUsuario!", // Nombre inyectado directamente aquí
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,

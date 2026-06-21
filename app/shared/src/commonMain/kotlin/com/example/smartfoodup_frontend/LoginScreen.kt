@@ -149,7 +149,7 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: (String) -> Un
                             mensajeError = resultado.mensaje
 
                             if (resultado.exitoso) {
-                                // 🚀 Le pasa el nombre devuelto al enrutador o un fallback si es nulo
+                                //  Le pasa el nombre devuelto al enrutador o un fallback si es nulo
                                 onLoginSuccess(resultado.nombre ?: "Usuario")
                             }
                         } catch (e: Exception) {

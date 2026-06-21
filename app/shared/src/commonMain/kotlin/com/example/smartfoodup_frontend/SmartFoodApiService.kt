@@ -9,8 +9,9 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import io.ktor.client.plugins.logging.*
 
-// Cliente HTTP global configurado para Ktor
+// Cliente HTTP global configurado para Ktor con soporte de Depuración (Técnica 6)
 val client = HttpClient {
     install(ContentNegotiation) {
         json(Json {
@@ -18,6 +19,11 @@ val client = HttpClient {
             prettyPrint = true
             isLenient = true
         })
+    }
+    // Habilitamos el monitoreo absoluto de transacciones cliente-servidor
+    install(Logging) {
+        logger = Logger.SIMPLE
+        level = LogLevel.ALL // Rastrea URL, Encabezados HTTP y estructuras JSON enviadas/recibidas
     }
 }
 
