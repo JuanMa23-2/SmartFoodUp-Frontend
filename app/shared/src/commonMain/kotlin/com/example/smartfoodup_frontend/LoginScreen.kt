@@ -28,7 +28,10 @@ import smartfoodup_frontend.app.shared.generated.resources.Res
 import smartfoodup_frontend.app.shared.generated.resources.logo_smartfoodup
 
 @Composable
-fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: (String) -> Unit) { // 👈 Firma ajustada
+fun LoginScreen(
+    onNavigateToRegister: () -> Unit,
+    onLoginSuccess: (String, String) -> Unit // Ajustado para recibir nombre y rol
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var mensajeError by remember { mutableStateOf("") }
@@ -149,8 +152,9 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: (String) -> Un
                             mensajeError = resultado.mensaje
 
                             if (resultado.exitoso) {
-                                //  Le pasa el nombre devuelto al enrutador o un fallback si es nulo
-                                onLoginSuccess(resultado.nombre ?: "Usuario")
+                                val nombreUsuario = resultado.nombre ?: "Usuario"
+                                val rolUsuario = resultado.rol ?: "CLIENTE"
+                                onLoginSuccess(nombreUsuario, rolUsuario)
                             }
                         } catch (e: Exception) {
                             cargando = false

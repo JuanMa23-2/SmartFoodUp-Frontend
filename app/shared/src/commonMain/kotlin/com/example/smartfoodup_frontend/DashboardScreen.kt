@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,7 +20,12 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(nombreUsuario: String, onCerrarSesion: () -> Unit) { // Recibe el nombre dinámico
+fun DashboardScreen(
+    nombreUsuario: String,
+    rolUsuario: String,
+    onCerrarSesion: () -> Unit,
+    onNavigateToAdminRegister: () -> Unit //Callback añadido para abrir el registro de admin
+) {
     val colorPrimario = MaterialTheme.colorScheme.primary
     val colorFondo = MaterialTheme.colorScheme.surfaceVariant
 
@@ -27,23 +33,25 @@ fun DashboardScreen(nombreUsuario: String, onCerrarSesion: () -> Unit) { // Reci
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "SmartFood UP",
-                        fontWeight = FontWeight.Bold,
-                        color = colorPrimario,
-                        fontSize = 20.sp
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(Res.drawable.logo_smartfoodup),
+                            contentDescription = "Logo SmartFoodUP",
+                            modifier = Modifier.size(45.dp),
+                            tint = Color.Unspecified
+                        )
+                        Text(
+                            text = "SmartFood UP",
+                            fontWeight = FontWeight.Bold,
+                            color = colorPrimario,
+                            fontSize = 20.sp
+                        )
+                    }
                 },
                 actions = {
-                    Icon(
-                        painter = painterResource(Res.drawable.logo_smartfoodup),
-                        contentDescription = "Logo Pequeño",
-                        modifier = Modifier
-                            .size(36.dp)
-                            .padding(end = 8.dp),
-                        tint = Color.Unspecified
-                    )
-
                     IconButton(onClick = onCerrarSesion) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
@@ -64,14 +72,36 @@ fun DashboardScreen(nombreUsuario: String, onCerrarSesion: () -> Unit) { // Reci
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Bienvenida Dinámica
-            Text(
-                text = "¡Hola de nuevo, $nombreUsuario!", // Nombre inyectado directamente aquí
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.align(Alignment.Start).padding(bottom = 4.dp)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "¡Hola de nuevo, $nombreUsuario!",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
+
+                val colorEtiqueta = if (rolUsuario == "ADMIN") Color(0xFFD32F2F) else Color(0xFF388E3C)
+                Box(
+                    modifier = Modifier
+                        .background(color = colorEtiqueta, shape = RoundedCornerShape(4.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = rolUsuario,
+                        color = Color.White,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
             Text(
                 text = "Monitoreo general de frescura en tiempo real.",
                 fontSize = 14.sp,
@@ -97,6 +127,28 @@ fun DashboardScreen(nombreUsuario: String, onCerrarSesion: () -> Unit) { // Reci
                         "Estado general óptimo. El refrigerador principal mantiene un índice de humedad estable.",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 14.sp
+                    )
+                }
+            }
+
+            if (rolUsuario == "ADMIN") {
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = onNavigateToAdminRegister, // Ejecuta el salto de pantalla
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PersonAdd,
+                        contentDescription = "Agregar usuario"
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Registrar Nuevo Usuario",
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }

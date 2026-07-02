@@ -13,5 +13,9 @@ data class RegistroRequest(
 data class AuthResponse(
     val exitoso: Boolean,
     val mensaje: String,
-    val nombre: String? = null // Mapeado perfectamente con el backend
+    val token: String? = null,
+    val usuarioId: Int? = null,
+    val nombre: String? = null,
+    val email: String? = null,
+    val rol: String? = null // Campo necesario para guardar si eres ADMIN o CLIENTE
 )

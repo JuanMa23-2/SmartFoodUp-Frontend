@@ -28,7 +28,10 @@ import smartfoodup_frontend.app.shared.generated.resources.Res
 import smartfoodup_frontend.app.shared.generated.resources.logo_smartfoodup
 
 @Composable
-fun RegisterScreen(onNavigateToLogin: () -> Unit, onRegisterSuccess: (String) -> Unit) { // 👈 Firma ajustada
+fun RegisterScreen(
+    onNavigateToLogin: () -> Unit,
+    onRegisterSuccess: (String, String) -> Unit // Ajustado para recibir nombre y rol
+) {
     var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -159,18 +162,24 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit, onRegisterSuccess: (String) ->
                     cargando = true
 
                     scope.launch {
-                        val requestData = RegistroRequest(nombre, email, password)
-                        val resultado = apiService.registrarUsuario(requestData)
+                        try {
+                            val requestData = RegistroRequest(nombre, email, contrasena = password)
+                            val resultado = apiService.registrarUsuario(requestData)
 
-                        cargando = false
-                        mensajeError = resultado.mensaje
+                            cargando = false
+                            mensajeError = resultado.mensaje
 
-                        if (resultado.exitoso) {
-                            val nombreRegistrado = resultado.nombre ?: nombre
-                            nombre = ""
-                            email = ""
-                            password = ""
-                            onRegisterSuccess(nombreRegistrado) // 🚀 Manda al dashboard
+                            if (resultado.exitoso) {
+                                val nombreRegistrado = resultado.nombre ?: nombre
+                                val rolUsuario = resultado.rol ?: "CLIENTE"
+                                nombre = ""
+                                email = ""
+                                password = ""
+                                onRegisterSuccess(nombreRegistrado, rolUsuario)
+                            }
+                        } catch (e: Exception) {
+                            cargando = false
+                            mensajeError = "Fallo de conexión local: ${e.message}"
                         }
                     }
                 }
