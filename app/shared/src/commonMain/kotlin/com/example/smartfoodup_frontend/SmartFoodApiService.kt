@@ -10,31 +10,6 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import io.ktor.client.plugins.logging.*
-import kotlinx.serialization.Serializable
-
-// Modelos de datos compartidos de autenticación
-@Serializable
-data class RegistroRequest(
-    val nombre: String,
-    val email: String,
-    val contrasena: String
-)
-
-@Serializable
-data class AdminRegistroRequest(
-    val nombre: String,
-    val email: String,
-    val contrasena: String,
-    val rol: String // El administrador puede elegir explícitamente el rol
-)
-
-@Serializable
-data class AuthResponse(
-    val exitoso: Boolean,
-    val mensaje: String,
-    val nombre: String? = null,
-    val rol: String? = null
-)
 
 val client = HttpClient {
     install(ContentNegotiation) {

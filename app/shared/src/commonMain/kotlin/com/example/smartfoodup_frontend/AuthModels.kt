@@ -10,6 +10,14 @@ data class RegistroRequest(
 )
 
 @Serializable
+data class AdminRegistroRequest(
+    val nombre: String,
+    val email: String,
+    val contrasena: String,
+    val rol: String // El administrador puede elegir explícitamente el rol
+)
+
+@Serializable
 data class AuthResponse(
     val exitoso: Boolean,
     val mensaje: String,
