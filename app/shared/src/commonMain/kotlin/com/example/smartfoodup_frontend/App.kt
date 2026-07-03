@@ -39,9 +39,17 @@ fun App() {
                 },
                 onNavigateToAdminRegister = {
                     pantallaActual = "admin_register"
+                },
+                onNavigateToAdminFood = {
+                    pantallaActual = "admin_food"
                 }
             )
             "admin_register" -> AdminRegisterScreen(
+                onNavigateBack = {
+                    pantallaActual = "dashboard"
+                }
+            )
+            "admin_food" -> AdminFoodScreen(
                 onNavigateBack = {
                     pantallaActual = "dashboard"
                 }

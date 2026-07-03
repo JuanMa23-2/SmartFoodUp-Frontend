@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -24,7 +25,8 @@ fun DashboardScreen(
     nombreUsuario: String,
     rolUsuario: String,
     onCerrarSesion: () -> Unit,
-    onNavigateToAdminRegister: () -> Unit //Callback añadido para abrir el registro de admin
+    onNavigateToAdminRegister: () -> Unit,
+    onNavigateToAdminFood: () -> Unit // Callback añadido para abrir el registro de alimentos
 ) {
     val colorPrimario = MaterialTheme.colorScheme.primary
     val colorFondo = MaterialTheme.colorScheme.surfaceVariant
@@ -131,25 +133,59 @@ fun DashboardScreen(
                 }
             }
 
+            // SECCIÓN EXCLUSIVA PARA ADMINISTRADORES
             if (rolUsuario == "ADMIN") {
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Button(
-                    onClick = onNavigateToAdminRegister, // Ejecuta el salto de pantalla
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                Text(
+                    text = "Panel de Control Administrativo",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.align(Alignment.Start).padding(bottom = 12.dp)
+                )
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.PersonAdd,
-                        contentDescription = "Agregar usuario"
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Registrar Nuevo Usuario",
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    // Botón 1: Registrar Personal
+                    Button(
+                        onClick = onNavigateToAdminRegister,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PersonAdd,
+                            contentDescription = "Agregar usuario"
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Registrar Nuevo Usuario",
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
+                    // Botón 2: Registrar Alimento (Catálogo)
+                    Button(
+                        onClick = onNavigateToAdminFood,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Fastfood,
+                            contentDescription = "Agregar alimento"
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Registrar Alimento al Catálogo",
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
             }
         }
