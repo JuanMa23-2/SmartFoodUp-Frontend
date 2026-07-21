@@ -10,6 +10,12 @@ data class RegistroRequest(
 )
 
 @Serializable
+data class LoginRequest(
+    val email: String,
+    val contrasena: String
+)
+
+@Serializable
 data class AdminRegistroRequest(
     val nombre: String,
     val email: String,

@@ -7,6 +7,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,7 +32,7 @@ import smartfoodup_frontend.app.shared.generated.resources.logo_smartfoodup
 @Composable
 fun LoginScreen(
     onNavigateToRegister: () -> Unit,
-    onLoginSuccess: (String, String) -> Unit // Ajustado para recibir nombre y rol
+    onLoginSuccess: (String, String) -> Unit // Recibe nombre y rol
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -42,6 +44,11 @@ fun LoginScreen(
 
     val scope = rememberCoroutineScope()
     val apiService = remember { SmartFoodApiService() }
+
+
+    // Invocación segura de Biometría nativa
+    val biometricHelper = rememberBiometricHelper()
+    val tieneHuellaConfigurada = biometricHelper.getSavedEmail() != null && biometricHelper.isBiometricSupported()
 
     Column(
         modifier = Modifier
@@ -135,44 +142,102 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(36.dp))
 
-        Button(
-            onClick = {
-                if (email.isBlank() || password.isBlank()) {
-                    mensajeError = "Por favor, ingresa tu correo y contraseña."
-                } else {
-                    mensajeError = ""
-                    cargando = true
+        // SECCIÓN DE INICIO DE SESIÓN INTEGRADA (TRADICIONAL + HUELLA)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Botón Tradicional
+            Button(
+                onClick = {
+                    if (email.isBlank() || password.isBlank()) {
+                        mensajeError = "Por favor, ingresa tu correo y contraseña."
+                    } else {
+                        mensajeError = ""
+                        cargando = true
 
-                    scope.launch {
-                        try {
-                            val requestData = RegistroRequest(nombre = "", email = email, contrasena = password)
-                            val resultado = apiService.iniciarSesion(requestData)
+                        scope.launch {
+                            try {
+                                val requestData = LoginRequest(email = email, contrasena = password)
+                                val resultado = apiService.iniciarSesion(requestData)
 
-                            cargando = false
-                            mensajeError = resultado.mensaje
+                                cargando = false
+                                mensajeError = resultado.mensaje
 
-                            if (resultado.exitoso) {
-                                val nombreUsuario = resultado.nombre ?: "Usuario"
-                                val rolUsuario = resultado.rol ?: "CLIENTE"
-                                onLoginSuccess(nombreUsuario, rolUsuario)
+                                if (resultado.exitoso) {
+                                    val nombreUsuario = resultado.nombre ?: "Usuario"
+                                    val rolUsuario = resultado.rol ?: "CLIENTE"
+                                    onLoginSuccess(nombreUsuario, rolUsuario)
+                                }
+                            } catch (e: Exception) {
+                                cargando = false
+                                mensajeError = "Fallo de conexión local: ${e.message}"
                             }
-                        } catch (e: Exception) {
-                            cargando = false
-                            mensajeError = "Fallo de conexión local: ${e.message}"
                         }
                     }
+                },
+                enabled = !cargando,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(52.dp)
+            ) {
+                if (cargando) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
+                } else {
+                    Text("Iniciar Sesión", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
-            },
-            enabled = !cargando,
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-        ) {
-            if (cargando) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
-            } else {
-                Text("Iniciar Sesión", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
+
+            // Botón Biométrico flotante (Visible solo si configuró la huella anteriormente)
+            if (tieneHuellaConfigurada) {
+                FilledIconButton(
+                    onClick = {
+                        biometricHelper.authenticate(
+                            title = "Acceso Rápido",
+                            subtitle = "Escanea tu huella para entrar inmediatamente",
+                            onSuccess = {
+                                cargando = true
+                                val emailGuardado = biometricHelper.getSavedEmail() ?: ""
+                                val passGuardada = biometricHelper.getSavedPassword() ?: ""
+
+                                scope.launch {
+                                    try {
+                                        val requestData = LoginRequest(email = emailGuardado, contrasena = passGuardada)
+                                        val resultado = apiService.iniciarSesion(requestData)
+                                        cargando = false
+
+                                        if (resultado.exitoso) {
+                                            onLoginSuccess(
+                                                resultado.nombre ?: "Usuario",
+                                                resultado.rol ?: "CLIENTE"
+                                            )
+                                        } else {
+                                            mensajeError = resultado.mensaje
+                                        }
+                                    } catch (e: Exception) {
+                                        cargando = false
+                                        mensajeError = "Error en conexión biométrica: ${e.message}"
+                                    }
+                                }
+                            },
+                            onError = { error -> mensajeError = error }
+                        )
+                    },
+                    enabled = !cargando,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.size(52.dp),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Fingerprint,
+                        contentDescription = "Acceso por huella dactilar",
+                        tint = MaterialTheme.colorScheme.onSecondary
+                    )
+                }
             }
         }
 

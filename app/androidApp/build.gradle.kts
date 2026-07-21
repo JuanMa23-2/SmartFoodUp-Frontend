@@ -17,6 +17,8 @@ dependencies {
 
     // Integración de Compose con la Actividad nativa de Android
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.fragment)
+    implementation(libs.androidx.appcompat)
 
     // DEPENDENCIAS DE JETPACK COMPOSE
     implementation(libs.compose.runtime)

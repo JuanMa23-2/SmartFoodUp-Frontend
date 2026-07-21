@@ -52,6 +52,10 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.ktor.client.okhttp)
+
+            //  DEPENDENCIAS NATIVAS DE SEGURIDAD Y BIOMETRÍA PARA ANDROID
+            implementation("androidx.biometric:biometric-ktx:1.2.0-alpha05")
+            implementation("androidx.security:security-crypto:1.1.0-alpha06")
         }
         commonMain.dependencies {
             api(projects.core)
@@ -66,7 +70,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
-            // 📡 Cliente HTTP Ktor (Sincronizado con tu versión 3.5.0 y compatible con wasmJs)
+            // 📡 Cliente HTTP Ktor
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.content.negotiation)
@@ -84,5 +88,4 @@ kotlin {
 
 dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
-
 }

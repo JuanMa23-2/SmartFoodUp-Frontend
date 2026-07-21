@@ -57,7 +57,7 @@ class SmartFoodApiService {
         }
     }
 
-    suspend fun iniciarSesion(request: RegistroRequest): AuthResponse {
+    suspend fun iniciarSesion(request: LoginRequest): AuthResponse {
         return try {
             val response = client.post("$BASE_URL/auth/login") {
                 contentType(ContentType.Application.Json)

@@ -3,16 +3,20 @@ package com.example.smartfoodup_frontend
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Fastfood
+import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import smartfoodup_frontend.app.shared.generated.resources.Res
@@ -26,10 +30,18 @@ fun DashboardScreen(
     rolUsuario: String,
     onCerrarSesion: () -> Unit,
     onNavigateToAdminRegister: () -> Unit,
-    onNavigateToAdminFood: () -> Unit // Callback añadido para abrir el registro de alimentos
+    onNavigateToAdminFood: () -> Unit // Abre el registro de alimentos
 ) {
     val colorPrimario = MaterialTheme.colorScheme.primary
     val colorFondo = MaterialTheme.colorScheme.surfaceVariant
+
+    // Gestión de biometría
+    val biometricHelper = rememberBiometricHelper()
+    var huellaActiva by remember { mutableStateOf(biometricHelper.getSavedEmail() != null) }
+    var mostrarDialogoContrasena by remember { mutableStateOf(false) }
+    var inputCorreoConfirmacion by remember { mutableStateOf("") }
+    var inputContraConfirmacion by remember { mutableStateOf("") }
+    var errorDialogo by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -133,6 +145,55 @@ fun DashboardScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ==========================================
+            // SECCIÓN ADICIONAL: PANEL DE ACCESO BIOMÉTRICO (HUELLA)
+            // ==========================================
+            if (biometricHelper.isBiometricSupported()) {
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                            Icon(
+                                imageVector = Icons.Default.Fingerprint,
+                                contentDescription = "Biometría",
+                                tint = colorPrimario,
+                                modifier = Modifier.size(32.dp)
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text("Acceso con Huella", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                Text(
+                                    if (huellaActiva) "Inicio de sesión rápido activo" else "Permite entrar con tu huella dactilar",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                        Switch(
+                            checked = huellaActiva,
+                            onCheckedChange = { activo ->
+                                if (activo) {
+                                    mostrarDialogoContrasena = true
+                                } else {
+                                    biometricHelper.clearCredentials()
+                                    huellaActiva = false
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
             // SECCIÓN EXCLUSIVA PARA ADMINISTRADORES
             if (rolUsuario == "ADMIN") {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -190,26 +251,107 @@ fun DashboardScreen(
             }
         }
     }
+
+    // DIÁLOGO DE CONFIGURACIÓN SEGURA PARA ENLAZAR LA HUELLA
+    if (mostrarDialogoContrasena) {
+        AlertDialog(
+            onDismissRequest = {
+                mostrarDialogoContrasena = false
+                errorDialogo = ""
+            },
+            title = { Text("Activar Acceso con Huella", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(
+                        "Por favor, introduce tu correo y contraseña actuales. Al hacerlo, se guardarán encriptados bajo la protección del chip criptográfico de tu teléfono.",
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    OutlinedTextField(
+                        value = inputCorreoConfirmacion,
+                        onValueChange = { inputCorreoConfirmacion = it },
+                        label = { Text("Confirma Correo") },
+                        shape = RoundedCornerShape(8.dp),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    )
+                    OutlinedTextField(
+                        value = inputContraConfirmacion,
+                        onValueChange = { inputContraConfirmacion = it },
+                        label = { Text("Ingresa Contraseña") },
+                        shape = RoundedCornerShape(8.dp),
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                    )
+                    if (errorDialogo.isNotEmpty()) {
+                        Text(errorDialogo, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (inputCorreoConfirmacion.isBlank() || inputContraConfirmacion.isBlank()) {
+                            errorDialogo = "Todos los campos son obligatorios."
+                        } else {
+                            // Solicita confirmación biométrica antes de guardar las credenciales
+                            biometricHelper.authenticate(
+                                title = "Configurar Huella",
+                                subtitle = "Escanea tu huella para finalizar la vinculación",
+                                onSuccess = {
+                                    biometricHelper.saveCredentials(inputCorreoConfirmacion, inputContraConfirmacion)
+                                    huellaActiva = true
+                                    mostrarDialogoContrasena = false
+                                    inputCorreoConfirmacion = ""
+                                    inputContraConfirmacion = ""
+                                    errorDialogo = ""
+                                },
+                                onError = { error ->
+                                    errorDialogo = error
+                                }
+                            )
+                        }
+                    }
+                ) {
+                    Text("Confirmar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    mostrarDialogoContrasena = false
+                    errorDialogo = ""
+                }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 }
 
 @Composable
-fun TarjetaMetrica(titulo: String, valor: String, colorIcono: Color, modifier: Modifier = Modifier) {
+fun TarjetaMetrica(titulo: String, valor: String, color: Color, modifier: Modifier = Modifier) {
     Card(
         shape = RoundedCornerShape(12.dp),
         modifier = modifier
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.Start
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .background(colorIcono, shape = RoundedCornerShape(50))
+            Text(
+                text = titulo,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(text = valor, fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-            Text(text = titulo, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                text = valor,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = color
+            )
         }
     }
 }
