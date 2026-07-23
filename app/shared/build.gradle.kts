@@ -32,7 +32,7 @@ kotlin {
     }
 
     androidLibrary {
-        namespace = "com.example.smartfoodup_frontend.app.shared"
+        namespace = "com.smartfoodup.app.shared"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -56,6 +56,8 @@ kotlin {
             //  DEPENDENCIAS NATIVAS DE SEGURIDAD Y BIOMETRÍA PARA ANDROID
             implementation("androidx.biometric:biometric-ktx:1.2.0-alpha05")
             implementation("androidx.security:security-crypto:1.1.0-alpha06")
+            implementation(libs.play.services.location)
+            implementation(libs.maps.compose)
         }
         commonMain.dependencies {
             api(projects.core)

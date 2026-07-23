@@ -1,4 +1,4 @@
-package com.example.smartfoodup_frontend
+package com.smartfoodup.app
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -48,7 +48,7 @@ fun LoginScreen(
 
     // Invocación segura de Biometría nativa
     val biometricHelper = rememberBiometricHelper()
-    val tieneHuellaConfigurada = biometricHelper.getSavedEmail() != null && biometricHelper.isBiometricSupported()
+    val tieneBiometriaConfigurada = biometricHelper.getSavedEmail() != null && biometricHelper.isBiometricSupported()
 
     Column(
         modifier = Modifier
@@ -190,13 +190,13 @@ fun LoginScreen(
                 }
             }
 
-            // Botón Biométrico flotante (Visible solo si configuró la huella anteriormente)
-            if (tieneHuellaConfigurada) {
+            // Botón Biométrico flotante (Visible solo si configuró la biometría anteriormente)
+            if (tieneBiometriaConfigurada) {
                 FilledIconButton(
                     onClick = {
                         biometricHelper.authenticate(
                             title = "Acceso Rápido",
-                            subtitle = "Escanea tu huella para entrar inmediatamente",
+                            subtitle = "Usa tu huella o rostro para entrar inmediatamente",
                             onSuccess = {
                                 cargando = true
                                 val emailGuardado = biometricHelper.getSavedEmail() ?: ""
@@ -234,7 +234,7 @@ fun LoginScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Fingerprint,
-                        contentDescription = "Acceso por huella dactilar",
+                        contentDescription = "Acceso biométrico",
                         tint = MaterialTheme.colorScheme.onSecondary
                     )
                 }

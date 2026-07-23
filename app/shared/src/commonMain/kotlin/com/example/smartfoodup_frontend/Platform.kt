@@ -1,4 +1,4 @@
-package com.example.smartfoodup_frontend
+package com.smartfoodup.app
 
 interface Platform {
     val name: String

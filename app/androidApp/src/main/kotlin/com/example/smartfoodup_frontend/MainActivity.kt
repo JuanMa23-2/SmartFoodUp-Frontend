@@ -1,5 +1,6 @@
-package com.example.smartfoodup_frontend
+package com.smartfoodup.app
 
+import com.smartfoodup.app.App
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.activity.compose.setContent

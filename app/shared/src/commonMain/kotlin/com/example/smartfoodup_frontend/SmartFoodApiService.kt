@@ -1,4 +1,4 @@
-package com.example.smartfoodup_frontend
+package com.smartfoodup.app
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

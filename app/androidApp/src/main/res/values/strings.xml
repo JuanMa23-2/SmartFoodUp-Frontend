@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">SmartFoodUpFrontend</string>
+    <string name="app_name">SmartFood UP</string>
+    <string name="title_climate_tracking">Inteligencia Ambiental</string>
 </resources>

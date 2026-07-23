@@ -1,12 +1,19 @@
-package com.example.smartfoodup_frontend
+package com.smartfoodup.app
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 
 @Composable
 fun App() {
-    MaterialTheme {
-        var pantallaActual by remember { mutableStateOf("login") }
+    SmartFoodUpTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            var pantallaActual by remember { mutableStateOf("login") }
 
         // Variables reactivas para almacenar los datos del usuario activo
         var usuarioLogueado by remember { mutableStateOf("") }
@@ -42,6 +49,9 @@ fun App() {
                 },
                 onNavigateToAdminFood = {
                     pantallaActual = "admin_food"
+                },
+                onNavigateToClimateTracking = {
+                    pantallaActual = "climate_tracking"
                 }
             )
             "admin_register" -> AdminRegisterScreen(
@@ -54,6 +64,12 @@ fun App() {
                     pantallaActual = "dashboard"
                 }
             )
+            "climate_tracking" -> ClimateTrackingScreen(
+                onNavigateBack = {
+                    pantallaActual = "dashboard"
+                }
+            )
         }
     }
+}
 }

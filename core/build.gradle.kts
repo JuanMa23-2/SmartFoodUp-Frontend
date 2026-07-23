@@ -22,7 +22,7 @@ kotlin {
     }
     
     androidLibrary {
-       namespace = "com.example.smartfoodup_frontend.core"
+        namespace = "com.smartfoodup.app.core"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
     

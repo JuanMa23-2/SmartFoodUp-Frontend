@@ -1,4 +1,4 @@
-package com.example.smartfoodup_frontend
+package com.smartfoodup.app
 
 import androidx.compose.ui.window.ComposeUIViewController
 
